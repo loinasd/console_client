@@ -116,6 +116,6 @@ class FHQFrontEndLib:
 			print ' * Response:' + r.text
 			print(' * Error.Code: ' + str(resp['error']['code']))
 			print(' * Error.Message: ' + str(resp['error']['message']))
-			print ' *************'
+			print ' ************'
 			return resp
 		return resp
