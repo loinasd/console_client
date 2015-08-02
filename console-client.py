@@ -24,8 +24,7 @@ def login(email, password):
 			email = email
 			password = getpass.getpass('Password: ')
 		else:
-			email = "levkiselev@gmail.com"
-			#email = raw_input("Email: ")
+			email = raw_input("Email: ")
 			password = getpass.getpass('Password: ')
 			if not api.security.login(email, password):
 				exit(1)
