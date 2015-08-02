@@ -20,8 +20,7 @@ password = None
 
 def login(email, password):
 	if password == None:
-		if email != None:
-			email = email
+		if email:
 			password = getpass.getpass('Password: ')
 		else:
 			email = raw_input("Email: ")
@@ -29,7 +28,6 @@ def login(email, password):
 			if not api.security.login(email, password):
 				exit(1)
 			token = api.token
-	else: email = email; password = password
 
 def choose_serv():
 	global url
