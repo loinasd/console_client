@@ -14,11 +14,11 @@ choosed_quest = ''
 choosed_gameid = 0
 url = 'http://fhq.sea-kg.com/api/'
 api = FHQFrontEndLib(url)
-email = None
+email = "levkiselev@gmail.com"
 password = None
 #####################
 
-def login(email, password):
+def login(email):
 	if password == None:
 		if email:
 			password = getpass.getpass('Password: ')
@@ -29,12 +29,12 @@ def login(email, password):
 				exit(1)
 			token = api.token
 
-def choose_serv():
+def choose_serv(url):
 	global url
 	global email
 	global password
 	global token
-	global api
+	#global api
 
 	print("1: http://fhq.sea-kg.com/api/\n2: http://fhq.keva.su/api/\n3: http://localhost/fhq/api/")
 	numsrv = raw_input("Please choose server: ")
@@ -53,14 +53,14 @@ def choose_serv():
 	login()
 	print('Your token: ' +token)
 
-def games_list():
+def games_list(None):
 	glist = api.games.list()
 	print
 	for key, value in glist['data'].iteritems():
 		print(value['id'] + ': ' + value['title'])
 	print
 
-def choose_game():
+def choose_game(game):
 	global choosed_game
 	games_list()
 	choosed_gameid = raw_input("Please choose game: ")
@@ -69,7 +69,7 @@ def choose_game():
 	print('Choosed game ' + game['data']['title'])
 	print
 
-def quests_list():
+def quests_list(None):
 		quests = api.quests.list({'filter_completed' : True, 'filter_open' : True, 'filter_current' : True})
 		formattablequests = '{:<8}|{:<15}|{:<20}|{:<10}|{:<5}'
 		print "\n"+formattablequests.format('Quest ID', 'Subject + Score', 'Name', 'Status', 'Solved')
@@ -78,15 +78,15 @@ def quests_list():
 			print formattablequests.format(value['questid'], value['subject'] + ' ' + value['score'], value['name'], value['status'], value['solved'])
 		print
 
-def time(): print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
+def time(None): print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
 
 #def choose_quest():
 
 
 allFunc = {"t(ime)?":time,"ch(ange|oose)? serv":choose_serv, r'ch(oose)? ?g(ame)?':choose_game, "g(ame)? ?l(ist)?":games_list,\
-"q(uests?)? ?l(ist)?": quests_list}
+"q(uests?)? ?l(ist)?": quests_list, "lg?(ogin)?":login}
 
-#login(email, password)
+login(email, password)
 while True:
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
@@ -96,30 +96,17 @@ while True:
 	else:
 		cmds = command.split(" ")
 		fcmd = cmds[0]
-
 		try:
-			tcmd = cmds[2]
-		except IndexError: pass
-
+			scmd = cmds[1]
+		except  IndexError:
+			for i in allFunc:
+				if re.match(i, fcmd):
+					allFunc[i](None)
 		else:
 			for i in allFunc:
-				if re.match(i, fcmd+scmd+tcmd):
-					allFunc[i](scmd, tcmd)
-				else: print "unknown command"
-
-		finally:
-			try:
-				scmd = cmds[1]
-			except  IndexError:
-				for i in allFunc:
-					if re.match(i, fcmd):
-						allFunc[i]()
-					else: print "unknown command"
-			else:
-				for i in allFunc:
-					if re.match(i, fcmd+scmd):
-						allFunc[i](scmd)
-					else: print "unknown command"
+				if re.match(i, fcmd+scmd):
+					allFunc[i](scmd)
+			
 
 		# for i in allFunc:
 		# 	if re.match(i, fcmd):
