@@ -6,6 +6,8 @@ import getpass
 import re
 from FHQFrontEndLib import FHQFrontEndLib
 from datetime import datetime
+
+
 ########VAR###########
 choosed_game = ''
 choosed_quest = ''
@@ -15,6 +17,7 @@ api = FHQFrontEndLib(url)
 email = None
 password = None
 #####################
+
 def login(email, password):
 	if password == None:
 		if email != None:
@@ -35,8 +38,10 @@ def choose_serv():
 	global password
 	global token
 	global api
+
 	print("1: http://fhq.sea-kg.com/api/\n2: http://fhq.keva.su/api/\n3: http://localhost/fhq/api/")
 	numsrv = raw_input("Please choose server: ")
+
 	url = ''
 	if numsrv == '1':
 		url = 'http://fhq.sea-kg.com/api/'
@@ -46,6 +51,7 @@ def choose_serv():
 		url = 'http://localhost/fhq/api/'
 	else:
 		url = 'http://fhq.sea-kg.com/api/'
+
 	print "Choosed: ", url
 	login()
 	print('Your token: ' +token)
@@ -55,7 +61,7 @@ def games_list():
 	print
 	for key, value in glist['data'].iteritems():
 		print(value['id'] + ': ' + value['title'])
-	print 
+	print
 
 def choose_game():
 	global choosed_game
@@ -73,7 +79,7 @@ def quests_list():
 		print formattablequests.format('--------', '---------------', '--------------------', '----------', '-----')
 		for key, value in enumerate(quests['data']):
 			print formattablequests.format(value['questid'], value['subject'] + ' ' + value['score'], value['name'], value['status'], value['solved'])
-		print 
+		print
 
 def time(): print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
 
@@ -93,13 +99,21 @@ while True:
 	else:
 		cmds = command.split(" ")
 		fcmd = cmds[0]
+
 		try:
 			tcmd = cmds[2]
 		except IndexError: pass
+
+		else:
+			for i in allFunc:
+				if re.match(i, fcmd+scmd+tcmd):
+					allFunc[i](scmd, tcmd)
+				else: print "unknown command"
+
 		finally:
 			try:
 				scmd = cmds[1]
-			except  IndexError: 
+			except  IndexError:
 				for i in allFunc:
 					if re.match(i, fcmd):
 						allFunc[i]()
@@ -109,12 +123,6 @@ while True:
 					if re.match(i, fcmd+scmd):
 						allFunc[i](scmd)
 					else: print "unknown command"
-		else:
-			for i in allFunc:
-				if re.match(i, fcmd+scmd+tcmd):
-					allFunc[i](scmd, tcmd)
-				else: print "unknown command"
-
 
 		# for i in allFunc:
 		# 	if re.match(i, fcmd):
