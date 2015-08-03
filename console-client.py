@@ -146,14 +146,25 @@ def user_info(uid):
 	answ = requests.post(url+"users/get.php", params={'userid':uid})
 	print answ
 	print answ.text
-	print answ.json()
 
 
-allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game,\
- r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(og)?in":login, r"sh(ow)?q(uest)?": show_quest,\
- r"lg?(og)?out": logout, r"ch(ange)?pass(word)?": change_password, r"u(ser)?id": user_info}
+allFunc = {
+r"t(ime)?"								:time,
+r"i(nfo)?"								:info,
+r"ch(ange|oose)?serv"			:choose_serv,
+r'ch(ange|oose)?g(ame)?'	:choose_game,
+r"g(ame)?l(ist)?"					:games_list,
+r"q(uests?)?l(ist)?"			:quests_list,
+r"l(o?g)?in"							:login,
+r"sh(ow)?q(uest)?"				:show_quest,\
+r"l(o?g)?out"							:logout,
+r"ch(ange)?pass(word)?"		:change_password,
+r"u(ser)?i(nfo)?"					:user_info
+
+}
 
 login(email)
+print "All commands types without any whitespace symbols.\nUsage: <command> [params]\nType 'help' for command list."
 while True: 
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
@@ -162,8 +173,8 @@ while True:
 			print func + '\t\t%s' % allFunc[func].__name__
 	else:
 		cmds = command.split()
-		fcmd = cmds[0]
-		scmd = " ".join(cmds[1:])
+		fcmd = cmds.pop(0)
+		scmd = " ".join(cmds)
 		for i in allFunc:
 			if re.match(i, fcmd+scmd):
 				allFunc[i](scmd)
