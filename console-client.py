@@ -51,8 +51,7 @@ def choose_serv(ur):
 def games_list(none):
 	glist = api.games.list()["data"]
 	for g in glist:
-		print glist[g]["type_game"]+" =>  "+glist[g][u"title"]#+ '\t'+ glist[g][u"date_start"]
-		#print glist
+		print "%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])#, glist[g][u"date_start"]
 	print
 def choose_game(game):
 	global choosed_game
@@ -119,7 +118,7 @@ def info(none):
 
 allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game, r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(ogin)?":login, r"sh(ow)?q(uest)?": show_quest}
 
-#login(email)
+login(email)
 while True: 
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
@@ -130,7 +129,7 @@ while True:
 		cmds = command.split(" ")
 		fcmd = cmds[0]
 		try:
-			scmd = cmds[1:]
+			scmd = str(cmds[1:])
 		except  IndexError:
 			for i in allFunc:
 				if re.match(i, fcmd):
