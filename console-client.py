@@ -26,7 +26,6 @@ def login(mail):
 		email = mail
 		password = getpass.getpass('Password: ')
 	if not api.security.login(email, password):	exit(1)
-	token = api.token
 def choose_serv(ur):
 	global url
 	global email
@@ -48,22 +47,30 @@ def choose_serv(ur):
 	else: url = ur
 	login(email)
 	print('Your token: ' +token)
+
 def games_list(none):
 	glist = api.games.list()["data"]
 	for g in glist:
 		print "%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])#, glist[g][u"date_start"]
 	print
+
 def choose_game(game):
 	global choosed_game
-	if game>=0:
-		choosed_gameid = game
+	if game!=None:
+		try:
+			choosed_gameid = int(game)
+		except: 
+			print "unknown id"
+			games_list(None)
+			choosed_gameid = int(raw_input("Please choose game: "))
 	else:
 		games_list(None)
-		choosed_gameid = raw_input("Please choose game: ")
+		choosed_gameid = int(raw_input("Please choose game: "))
 	game = api.games.choose(choosed_gameid)
 	choosed_game = game['data']['title']
 	print('Choosed game ' + game['data']['title'])
 	print
+
 def quests_list(none):
 		quests = api.quests.list({'filter_completed' : True, 'filter_open' : True, 'filter_current' : True})
 		formattablequests = '{:<8}|{:<15}|{:<20}|{:<10}|{:<5}'
@@ -72,7 +79,9 @@ def quests_list(none):
 		for key, value in enumerate(quests['data']):
 			print formattablequests.format(value['questid'], value['subject'] + ' ' + value['score'], value['name'], value['status'], value['solved'])
 		print
+
 def time(none): print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
+
 def show_quest(questid):
 	quest = api.quests.get(questid)
 	print '   Subject: ' + quest['data']['subject']
@@ -82,6 +91,7 @@ def show_quest(questid):
 	print '      Text: '
 	print quest['data']['text']
 	print 
+
 def pass_quest(string):
 		if re.match(r'^([0-9]+) (.*)$', string):
 			match = re.match(r'^([0-9]+) (.*)$', string)
@@ -94,6 +104,7 @@ def pass_quest(string):
 				print result['error']['message']
 		else:
 			print "unknown command"
+
 def info(none):
 	i = r.get(site+"/api/public/info.php").json()
 	if i["result"] == "ok":
@@ -116,7 +127,21 @@ def info(none):
 				print "    ", user["user"], " --> ", user["score"]
 	else: print "error"
 
-allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game, r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(ogin)?":login, r"sh(ow)?q(uest)?": show_quest}
+def logout(none):
+	out = {"token":api.token}
+	requests.post(url+"security/logout.php", params=out)
+
+def change_password(none):
+	old_pass = getpass.getpass("Password: ")
+	new_pass = getpass.getpass("New Password: ")
+	confirm = getpass.getpass("Confirm new Password: ")
+	p = {'old_password':old_pass, "new_password":new_pass, "new_password_confirm":confirm}
+	answer = requests.post(url+"users/change_password.php", params=p)
+	print answer.text
+
+allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game,\
+ r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(og)?in":login, r"sh(ow)?q(uest)?": show_quest,\
+ r"lg?(og)?out": logout, r"ch(ange)?pass(word)?": change_password}
 
 login(email)
 while True: 
@@ -126,10 +151,12 @@ while True:
 		for func in allFunc:
 			print func + '\t\t%s' % allFunc[func].__name__
 	else:
-		cmds = command.split(" ")
+		cmds = command.split()
 		fcmd = cmds[0]
+		scmd = ""
 		try:
-			scmd = str(cmds[1:])
+			scmd = " ".join(cmds[1:])
+			print scmd
 		except  IndexError:
 			for i in allFunc:
 				if re.match(i, fcmd):
