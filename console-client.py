@@ -60,7 +60,7 @@ def choose_game(game):
 	if game:
 		try:
 			choosed_gameid = int(game)
-		except: 
+		except:
 			print "unknown id"
 			games_list(None)
 			choosed_gameid = int(raw_input("Please choose game: "))
@@ -91,7 +91,7 @@ def show_quest(questid):
 	print '    Author: ' + quest['data']['author']
 	print '      Text: '
 	print quest['data']['text']
-	print 
+	print
 
 def pass_quest(string):
 		if re.match(r'^([0-9]+) (.*)$', string):
@@ -117,8 +117,8 @@ def info(none):
 			print city, ", ",
 		quests = data["quests"]
 		print
-		print "Quests: %s  " % quests["count"], 
-		print "All attempts: %s  " % quests["attempts"], 
+		print "Quests: %s  " % quests["count"],
+		print "All attempts: %s  " % quests["attempts"],
 		print "Solved: %s  " % quests["solved"]
 		win = data["winners"]
 		for game in win:
@@ -149,21 +149,31 @@ def user_info(uid):
 	print answ.json()
 
 
-allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game,\
- r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(og)?in":login, r"sh(ow)?q(uest)?": show_quest,\
- r"lg?(og)?out": logout, r"ch(ange)?pass(word)?": change_password, r"u(ser)?id": user_info}
+client_commands = {
+	r"t(ime)?"               : time,
+	r"i(nfo)?"               : info,
+	r"ch(ange|oose)?serv"    : choose_serv,
+	r"ch(oose)?g(ame)?"      : choose_game,
+	r"g(ame)?l(ist)?"        : games_list,
+	r"q(uests?)?l(ist)?"     : quests_list,
+	r"lg?(og)?in"            : login,
+	r"sh(ow)?q(uest)?"       : show_quest,
+	r"lg?(og)?out"           : logout,
+	r"ch(ange)?pass(word)?"  : change_password,
+	r"u(ser)?id"             : user_info
+}
 
 login(email)
-while True: 
+while True:
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
 	elif command == "h" or command == "help":
-		for func in allFunc:
-			print func + '\t\t%s' % allFunc[func].__name__
+		for func in client_commands:
+			print func + '\t\t%s' % client_commands[func].__name__
 	else:
 		cmds = command.split()
 		fcmd = cmds[0]
 		scmd = " ".join(cmds[1:])
-		for i in allFunc:
+		for i in client_commands:
 			if re.match(i, fcmd+scmd):
-				allFunc[i](scmd)
+				client_commands[i](scmd)
