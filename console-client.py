@@ -15,7 +15,7 @@ choosed_gameid = 0
 url = 'http://fhq.sea-kg.com/api/'
 api = FHQFrontEndLib(url)
 email = None
-
+email = "levkiselev@gmail.com"
 #####################
 
 def login(mail):
@@ -51,10 +51,12 @@ def choose_serv(ur):
 	print('Your token: ' +token)
 
 def games_list(none):
-	glist = api.games.list()
-	print glist
-	# for key, value in glist['data'].iteritems():
-	# 	print(value['id'] + ': ' + value['title'])
+	#glist = api.games.list()["data"]
+	glist= {u'532e2d5f-f6fb-20da-d86d-db3e595645e8': {u'date_stop': u'2015-07-03 18:00:59', u'type_game': u'jeopardy', u'description': u'This game just some collection of quests', u'form': u'online', u'title': u'freehackquest-big-game', u'date_start': u'2015-07-02 19:00:00', u'nick': u'admin', u'state': u'original', u'logo': u'files/games/1.png', u'owner': u'47', u'date_restart': u'2015-07-04 17:00:31', u'permissions': {u'export': False, u'update': False, u'delete': False}, u'maxscore': u'10', u'id': u'1', u'organizators': u'any'}, u'c3e15695-89a3-4ace-c767-9e09b38496b3': {u'date_stop': u'2015-05-11 11:30:00', u'type_game': u'jeopardy', u'description': u'unlicenced copy.\n\nhttps://ctftime.org/event/188/tasks/', u'form': u'online', u'title': u'ASIS Quals CTF 2015', u'date_start': u'2015-05-09 11:30:10', u'nick': u'admin', u'state': u'unlicensed-copy', u'logo': u'files/games/2.png', u'owner': u'47', u'date_restart': u'2015-05-13 14:33:04', u'permissions': {u'export': False, u'update': False, u'delete': False}, u'maxscore': u'775', u'id': u'2', u'organizators': u'ASIS'}}
+	glist=glist
+	for g in glist:
+		print glist[g]["type_game"]+" =>  "+glist[g][u"title"]#+ '\t'+ glist[g][u"date_start"]
+		#print glist
 	print
 
 def choose_game(game):
@@ -90,9 +92,23 @@ def show_quest(questid):
 	print quest['data']['text']
 	print 
 
+def pass_quest(string):
+		if re.match(r'^([0-9]+) (.*)$', string):
+			match = re.match(r'^([0-9]+) (.*)$', string)
+			questid = match.group(1)
+			answer = match.group(2)
+			result = api.quests.trypass(questid, answer)
+			if result['result'] == 'ok':
+				print "quest passed"
+			else:
+				print result['error']['message']
+		else:
+			print "unknown command"
+
+
 allFunc = {r"t(ime)?":time,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game, r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, "lg?(ogin)?":login, "sh(ow)?q(uest)?": show_quest}
 
-login(email)
+#login(email)
 while True: 
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
@@ -112,24 +128,3 @@ while True:
 			for i in allFunc:
 				if re.match(i, fcmd+scmd):
 					allFunc[i](scmd)
-
-# 	elif re.match(r'^quest show ([0-9]+)$', command):
-# 		match = re.match(r'^quest show ([0-9]+)$', command)
-# 		questid = match.group(1)
-# 		quest = api.quests.get(questid)
-# 		print '   Subject: ' + quest['data']['subject']
-# 		print '     Score: ' + quest['data']['score']
-# 		print '      Name: ' + quest['data']['name']
-# 		print '    Author: ' + quest['data']['author']
-# 		print '      Text: '
-# 		print quest['data']['text']
-# 		print ""
-# 	elif re.match(r'^quest pass ([0-9]+) (.*)$', command):
-# 		match = re.match(r'^quest pass ([0-9]+) (.*)$', command)
-# 		questid = match.group(1)
-# 		answer = match.group(2)
-# 		result = api.quests.trypass(questid, answer)
-# 		if result['result'] == 'ok':
-# 			print "quest passed"
-# 		else:
-# 			print result['error']['message']
