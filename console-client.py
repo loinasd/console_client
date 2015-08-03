@@ -6,35 +6,35 @@ import getpass
 import re
 from FHQFrontEndLib import FHQFrontEndLib
 from datetime import datetime
-
-
 ########VAR###########
 choosed_game = ''
 choosed_quest = ''
-choosed_gameid = 0
+email = ""
 url = 'http://fhq.sea-kg.com/api/'
 api = FHQFrontEndLib(url)
-email = None
+
 #####################
 
 def login(mail):
-	if mail== None:
+	global token
+	if mail=='':
 		email = raw_input("Email: ")
 		password = getpass.getpass('Password: ')
 	else:
 		email = mail
 		password = getpass.getpass('Password: ')
 	if not api.security.login(email, password):	exit(1)
+	token = api.token
 
 def choose_serv(ur):
 	global url
 	global email
 	global password
 	global token
-	if not url:
+	global api
+	if not ur:
 		print("1: http://fhq.sea-kg.com/api/\n2: http://fhq.keva.su/api/\n3: http://localhost/fhq/api/")
 		numsrv = raw_input("Please choose server: ")
-		url = ''
 		if numsrv == '1':
 			url = 'http://fhq.sea-kg.com/api/'
 		elif numsrv == '2':
@@ -45,6 +45,7 @@ def choose_serv(ur):
 			url = 'http://fhq.sea-kg.com/api/'
 		print "Choosed: ", url
 	else: url = ur
+	api = FHQFrontEndLib(url)
 	login(email)
 	print('Your token: ' +token)
 
@@ -56,7 +57,7 @@ def games_list(none):
 
 def choose_game(game):
 	global choosed_game
-	if game!=None:
+	if game:
 		try:
 			choosed_gameid = int(game)
 		except: 
@@ -139,9 +140,18 @@ def change_password(none):
 	answer = requests.post(url+"users/change_password.php", params=p)
 	print answer.text
 
+def user_info(uid):
+	if not uid:
+		uid = raw_input("user id: ")
+	answ = requests.post(url+"users/get.php", params={'userid':uid})
+	print answ
+	print answ.text
+	print answ.json()
+
+
 allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game,\
  r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(og)?in":login, r"sh(ow)?q(uest)?": show_quest,\
- r"lg?(og)?out": logout, r"ch(ange)?pass(word)?": change_password}
+ r"lg?(og)?out": logout, r"ch(ange)?pass(word)?": change_password, r"u(ser)?id": user_info}
 
 login(email)
 while True: 
@@ -153,15 +163,7 @@ while True:
 	else:
 		cmds = command.split()
 		fcmd = cmds[0]
-		scmd = ""
-		try:
-			scmd = " ".join(cmds[1:])
-			print scmd
-		except  IndexError:
-			for i in allFunc:
-				if re.match(i, fcmd):
-					allFunc[i](None)
-		else:
-			for i in allFunc:
-				if re.match(i, fcmd+scmd):
-					allFunc[i](scmd)
+		scmd = " ".join(cmds[1:])
+		for i in allFunc:
+			if re.match(i, fcmd+scmd):
+				allFunc[i](scmd)
