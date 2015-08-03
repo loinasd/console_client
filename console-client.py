@@ -17,7 +17,7 @@ api = FHQFrontEndLib(url)
 
 def login(mail):
 	global token
-	if mail=='':
+	if mail == '':
 		email = raw_input("Email: ")
 		password = getpass.getpass('Password: ')
 	else:
@@ -27,24 +27,25 @@ def login(mail):
 	token = api.token
 
 def choose_serv(ur):
-	global url
-	global email
-	global password
-	global token
-	global api
+	global url, email, password, token, api
+
 	if not ur:
 		print("1: http://fhq.sea-kg.com/api/\n2: http://fhq.keva.su/api/\n3: http://localhost/fhq/api/")
 		numsrv = raw_input("Please choose server: ")
-		if numsrv == '1':
-			url = 'http://fhq.sea-kg.com/api/'
-		elif numsrv == '2':
-			url = 'http://fhq.keva.su/api/'
-		elif numsrv == '3':
-			url = 'http://localhost/fhq/api/'
-		else:
-			url = 'http://fhq.sea-kg.com/api/'
+		try: numsrv = int(numsrv)
+		except ValueError: numsrv = 0 # default domen
+
+		domens = [
+			'http://fhq.sea-kg.com/api/',
+			'http://fhq.keva.su/api/',
+			'http://localhost/fhq/api/',
+		]
+		url = domens[numsrv]
 		print "Choosed: ", url
-	else: url = ur
+
+	else:
+		url = ur
+
 	api = FHQFrontEndLib(url)
 	login(email)
 	print('Your token: ' +token)
@@ -60,7 +61,7 @@ def choose_game(game):
 	if game:
 		try:
 			choosed_gameid = int(game)
-		except: 
+		except:
 			print "unknown id"
 			games_list(None)
 			choosed_gameid = int(raw_input("Please choose game: "))
@@ -85,13 +86,28 @@ def time(none): print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
 
 def show_quest(questid):
 	quest = api.quests.get(questid)
-	print '   Subject: ' + quest['data']['subject']
-	print '     Score: ' + quest['data']['score']
-	print '      Name: ' + quest['data']['name']
-	print '    Author: ' + quest['data']['author']
-	print '      Text: '
-	print quest['data']['text']
-	print 
+
+	# use template
+	print """
+   Subject: {subject}
+	 Score: {score}
+	  Name: {name}
+	Author: {author}
+	  Text:\n{text}
+	""".format(
+				subject = quest['data']['subject'],
+				score = quest['data']['score'],
+				name = quest['data']['name'],
+				author = quest['data']['author'],
+				text = quest['data']['text'])
+
+	# print '   Subject: ' + quest['data']['subject']
+	# print '	 Score: ' + quest['data']['score']
+	# print '	  Name: ' + quest['data']['name']
+	# print '	Author: ' + quest['data']['author']
+	# print '	  Text: '
+	# print quest['data']['text']
+	# print
 
 def pass_quest(string):
 		if re.match(r'^([0-9]+) (.*)$', string):
@@ -117,15 +133,15 @@ def info(none):
 			print city, ", ",
 		quests = data["quests"]
 		print
-		print "Quests: %s  " % quests["count"], 
-		print "All attempts: %s  " % quests["attempts"], 
+		print "Quests: %s  " % quests["count"],
+		print "All attempts: %s  " % quests["attempts"],
 		print "Solved: %s  " % quests["solved"]
 		win = data["winners"]
 		for game in win:
 			print game + ": "
 			gam = win["%s" % game]
 			for user in gam:
-				print "    ", user["user"], " --> ", user["score"]
+				print "	", user["user"], " --> ", user["score"]
 	else: print "error"
 
 def logout(none):
@@ -149,21 +165,31 @@ def user_info(uid):
 	print answ.json()
 
 
-allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game,\
- r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(og)?in":login, r"sh(ow)?q(uest)?": show_quest,\
- r"lg?(og)?out": logout, r"ch(ange)?pass(word)?": change_password, r"u(ser)?id": user_info}
+client_commands = {
+	r"t(ime)?"			   : time,
+	r"i(nfo)?"			   : info,
+	r"ch(ange|oose)?serv"	: choose_serv,
+	r"ch(oose)?g(ame)?"	  : choose_game,
+	r"g(ame)?l(ist)?"		: games_list,
+	r"q(uests?)?l(ist)?"	 : quests_list,
+	r"lg?(og)?in"			: login,
+	r"sh(ow)?q(uest)?"	   : show_quest,
+	r"lg?(og)?out"		   : logout,
+	r"ch(ange)?pass(word)?"  : change_password,
+	r"u(ser)?id"			 : user_info
+}
 
 login(email)
-while True: 
+while True:
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
 	elif command == "h" or command == "help":
-		for func in allFunc:
-			print func + '\t\t%s' % allFunc[func].__name__
+		for func in client_commands:
+			print func + '\t\t%s' % client_commands[func].__name__
 	else:
 		cmds = command.split()
 		fcmd = cmds[0]
 		scmd = " ".join(cmds[1:])
-		for i in allFunc:
+		for i in client_commands:
 			if re.match(i, fcmd+scmd):
-				allFunc[i](scmd)
+				client_commands[i](scmd)
