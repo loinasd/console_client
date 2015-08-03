@@ -15,7 +15,6 @@ choosed_gameid = 0
 url = 'http://fhq.sea-kg.com/api/'
 api = FHQFrontEndLib(url)
 email = None
-email = "levkiselev@gmail.com"
 #####################
 
 def login(mail):
@@ -26,6 +25,7 @@ def login(mail):
 		email = mail
 		password = getpass.getpass('Password: ')
 	if not api.security.login(email, password):	exit(1)
+
 def choose_serv(ur):
 	global url
 	global email
