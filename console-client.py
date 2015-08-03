@@ -51,9 +51,7 @@ def choose_serv(ur):
 
 def games_list(none):
 	glist = api.games.list()["data"]
-	for g in glist:
-		print "%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])#, glist[g][u"date_start"]
-	print
+	print ["%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"]) for g in glist]
 
 def choose_game(game):
 	global choosed_game
@@ -137,36 +135,44 @@ def change_password(none):
 	new_pass = getpass.getpass("New Password: ")
 	confirm = getpass.getpass("Confirm new Password: ")
 	p = {'old_password':old_pass, "new_password":new_pass, "new_password_confirm":confirm, "token":token}
-	answer = requests.post(url+"users/change_password.php", params=p)
-	print answer.text
+	if requests.post(url+"users/change_password.php", params=p).json["result"]=="ok": print "Success!"
+	else: print "Fail"
 
 def user_info(uid):
 	if not uid:
 		uid = raw_input("user id: ")
-	answ = requests.post(url+"users/get.php", params={'userid':uid, "token":token})
-	print answ
-	print answ.text
+	answ = requests.post(url+"users/get.php", params={'userid':uid, "token":token}).json()
+	data = answ[u"data"]
+	for key in data: print "\n%s :  %s" % (key, data[key])
 
-def scoreboard():
-	pass
-
-def events_list():
-	pass
+def scoreboard(gid):
+	if not gid:
+		gid = raw_input('Enter gameid: ')
+	answ = requests.post(url+'games/scoreboard.php', params={"token":token, "gameid":gid}).json()
+	data = answ["data"]
+	formattable = '{:<7}|{:<4}|{:<20}|{:<7}'
+	print "\n"+formattable.format(" Place ", " ID ", "        Nick        ", " Score ")
+	print formattable.format("-------","----","--------------------","-------")
+	for place in data:
+		for users in data[place]:
+			while len(users["nick"])<19:
+				users["nick"] += " "
+			print "   %s   | %s | %s| %s" %(place, users["userid"], users["nick"], users["score"])
 
 allFunc = {
-	r"t(ime)?"                       :time,
-	r"i(nfo)?"                       :info,
-	r"ch(ange|oose)?serv"            :choose_serv,
-	r'ch(ange|oose)?g(ame)?'         :choose_game,
-	r"g(ame)?l(ist)?"                :games_list,
-	r"q(uests?)?l(ist)?"             :quests_list,
-	r"l(o?g)?in"                     :login,
-	r"sh(ow)?q(uest)?"               :show_quest,
-	r"l(o?g)?out"                    :logout,
-	r"ch(ange)?p(ass)?(w(or)?d)?"    :change_password,
-	r"u(ser)?i(nfo)?"                :user_info,
-	r"sc?(ore)?b(oar)?d?"            :scoreboard,
-	r"ev?(ents?)?l(ist)?"            :events_list
+r"t(ime)?"                       :time,
+r"i(nfo)?"                       :info,
+r"ch(ange|oose)?serv"            :choose_serv,
+r'ch(ange|oose)?g(ame)?'         :choose_game,
+r"g(ame)?l(ist)?"                :games_list,
+r"q(uests?)?l(ist)?"             :quests_list,
+r"l(o?g)?in"                     :login,
+r"sh(ow)?q(uest)?"               :show_quest,
+r"l(o?g)?out"                    :logout,
+r"ch(ange)?p(ass)?(w(or)?d)?"    :change_password,
+r"u(ser)?i(nfo)?"                :user_info,
+r"(sc?(ore)?|l(ead)?)b(oar)?d?"  :scoreboard,
+#r"ev?(ents?)?l(ist)?"            :events_list
 }
 
 login(email)
