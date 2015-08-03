@@ -136,31 +136,37 @@ def change_password(none):
 	old_pass = getpass.getpass("Password: ")
 	new_pass = getpass.getpass("New Password: ")
 	confirm = getpass.getpass("Confirm new Password: ")
-	p = {'old_password':old_pass, "new_password":new_pass, "new_password_confirm":confirm}
+	p = {'old_password':old_pass, "new_password":new_pass, "new_password_confirm":confirm, "token":token}
 	answer = requests.post(url+"users/change_password.php", params=p)
 	print answer.text
 
 def user_info(uid):
 	if not uid:
 		uid = raw_input("user id: ")
-	answ = requests.post(url+"users/get.php", params={'userid':uid})
+	answ = requests.post(url+"users/get.php", params={'userid':uid, "token":token})
 	print answ
 	print answ.text
 
+def scoreboard():
+	pass
+
+def events_list():
+	pass
 
 allFunc = {
-r"t(ime)?"								:time,
-r"i(nfo)?"								:info,
-r"ch(ange|oose)?serv"			:choose_serv,
-r'ch(ange|oose)?g(ame)?'	:choose_game,
-r"g(ame)?l(ist)?"					:games_list,
-r"q(uests?)?l(ist)?"			:quests_list,
-r"l(o?g)?in"							:login,
-r"sh(ow)?q(uest)?"				:show_quest,\
-r"l(o?g)?out"							:logout,
-r"ch(ange)?pass(word)?"		:change_password,
-r"u(ser)?i(nfo)?"					:user_info
-
+	r"t(ime)?"                       :time,
+	r"i(nfo)?"                       :info,
+	r"ch(ange|oose)?serv"            :choose_serv,
+	r'ch(ange|oose)?g(ame)?'         :choose_game,
+	r"g(ame)?l(ist)?"                :games_list,
+	r"q(uests?)?l(ist)?"             :quests_list,
+	r"l(o?g)?in"                     :login,
+	r"sh(ow)?q(uest)?"               :show_quest,
+	r"l(o?g)?out"                    :logout,
+	r"ch(ange)?p(ass)?(w(or)?d)?"    :change_password,
+	r"u(ser)?i(nfo)?"                :user_info,
+	r"sc?(ore)?b(oar)?d?"            :scoreboard,
+	r"ev?(ents?)?l(ist)?"            :events_list
 }
 
 login(email)
