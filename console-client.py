@@ -27,7 +27,6 @@ def login(mail):
 		password = getpass.getpass('Password: ')
 	if not api.security.login(email, password):	exit(1)
 	token = api.token
-
 def choose_serv(ur):
 	global url
 	global email
@@ -49,16 +48,12 @@ def choose_serv(ur):
 	else: url = ur
 	login(email)
 	print('Your token: ' +token)
-
 def games_list(none):
-	#glist = api.games.list()["data"]
-	glist= {u'532e2d5f-f6fb-20da-d86d-db3e595645e8': {u'date_stop': u'2015-07-03 18:00:59', u'type_game': u'jeopardy', u'description': u'This game just some collection of quests', u'form': u'online', u'title': u'freehackquest-big-game', u'date_start': u'2015-07-02 19:00:00', u'nick': u'admin', u'state': u'original', u'logo': u'files/games/1.png', u'owner': u'47', u'date_restart': u'2015-07-04 17:00:31', u'permissions': {u'export': False, u'update': False, u'delete': False}, u'maxscore': u'10', u'id': u'1', u'organizators': u'any'}, u'c3e15695-89a3-4ace-c767-9e09b38496b3': {u'date_stop': u'2015-05-11 11:30:00', u'type_game': u'jeopardy', u'description': u'unlicenced copy.\n\nhttps://ctftime.org/event/188/tasks/', u'form': u'online', u'title': u'ASIS Quals CTF 2015', u'date_start': u'2015-05-09 11:30:10', u'nick': u'admin', u'state': u'unlicensed-copy', u'logo': u'files/games/2.png', u'owner': u'47', u'date_restart': u'2015-05-13 14:33:04', u'permissions': {u'export': False, u'update': False, u'delete': False}, u'maxscore': u'775', u'id': u'2', u'organizators': u'ASIS'}}
-	glist=glist
+	glist = api.games.list()["data"]
 	for g in glist:
 		print glist[g]["type_game"]+" =>  "+glist[g][u"title"]#+ '\t'+ glist[g][u"date_start"]
 		#print glist
 	print
-
 def choose_game(game):
 	global choosed_game
 	if game>=0:
@@ -70,7 +65,6 @@ def choose_game(game):
 	choosed_game = game['data']['title']
 	print('Choosed game ' + game['data']['title'])
 	print
-
 def quests_list(none):
 		quests = api.quests.list({'filter_completed' : True, 'filter_open' : True, 'filter_current' : True})
 		formattablequests = '{:<8}|{:<15}|{:<20}|{:<10}|{:<5}'
@@ -79,9 +73,7 @@ def quests_list(none):
 		for key, value in enumerate(quests['data']):
 			print formattablequests.format(value['questid'], value['subject'] + ' ' + value['score'], value['name'], value['status'], value['solved'])
 		print
-
 def time(none): print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
-
 def show_quest(questid):
 	quest = api.quests.get(questid)
 	print '   Subject: ' + quest['data']['subject']
@@ -91,7 +83,6 @@ def show_quest(questid):
 	print '      Text: '
 	print quest['data']['text']
 	print 
-
 def pass_quest(string):
 		if re.match(r'^([0-9]+) (.*)$', string):
 			match = re.match(r'^([0-9]+) (.*)$', string)
@@ -104,9 +95,29 @@ def pass_quest(string):
 				print result['error']['message']
 		else:
 			print "unknown command"
+def info(none):
+	i = r.get(site+"/api/public/info.php").json()
+	if i["result"] == "ok":
+		print "Sucssess..."
+		print "Lead Time (sec):", i["lead_time_sec"]
+		data = i["data"]
+		print "Cities:   ",
+		for city in data["cities"]:
+			print city, ", ",
+		quests = data["quests"]
+		print
+		print "Quests: %s  " % quests["count"], 
+		print "All attempts: %s  " % quests["attempts"], 
+		print "Solved: %s  " % quests["solved"]
+		win = data["winners"]
+		for game in win:
+			print game + ": "
+			gam = win["%s" % game]
+			for user in gam:
+				print "    ", user["user"], " --> ", user["score"]
+	else: print "error"
 
-
-allFunc = {r"t(ime)?":time,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game, r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, "lg?(ogin)?":login, "sh(ow)?q(uest)?": show_quest}
+allFunc = {r"t(ime)?":time,r"i(nfo)?":info,r"ch(ange|oose)?serv":choose_serv, r'ch(oose)?g(ame)?':choose_game, r"g(ame)?l(ist)?":games_list,r"q(uests?)?l(ist)?": quests_list, r"lg?(ogin)?":login, r"sh(ow)?q(uest)?": show_quest}
 
 #login(email)
 while True: 
@@ -119,7 +130,7 @@ while True:
 		cmds = command.split(" ")
 		fcmd = cmds[0]
 		try:
-			scmd = cmds[1]
+			scmd = cmds[1:]
 		except  IndexError:
 			for i in allFunc:
 				if re.match(i, fcmd):
