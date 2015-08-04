@@ -16,18 +16,20 @@ class FHQ():
 		self.url = 'http://fhq.sea-kg.com/api/'
 		self.api = FHQFrontEndLib(self.url)
 		self.allFunc = {
-			r"t(ime)?"                            : self.time,
-			r"i(nfo)?"                            : self.info,
-			r"ch(ange|oose)?\-?serv"              : self.choose_serv,
-			r'ch(ange|oose)?\-?g(ame)?'           : self.choose_game,
-			r"l?g(ame)?\-?l(ist)?"                : self.games_list,
-			r"l?q(uests?)?\-?l(ist)?"             : self.quests_list,
-			r"l(o?g)?in"                          : self.login,
-			r"sh(ow)?\-?q(uest)?"                 : self.show_quest,
-			r"l(o?g)?out"                         : self.logout,
-			r"ch(ange)?\-?p(ass)?(w(or)?d)?"      : self.change_password,
-			r"u(ser)?\-?i(nfo)?"                  : self.user_info,
-			r"(sc?(ore)?|l(ead(er)?)?)b(oar)?d?"  : self.scoreboard,
+			r"t(ime)?"                                 : self.time,
+			r"i(nfo)?"                                 : self.info,
+			r"ch(ange|oose)?(\_|\-)?serv"              : self.choose_serv,
+			r'ch(ange|oose)?(\_|\-)?g(ame)?'           : self.choose_game,
+			r"l?g(ame)?(\_|\-)?l(ist)?"                : self.games_list,
+			r"l?q(uests?)?(\_|\-)?l(ist)?"             : self.quests_list,
+			r"l(o?g)?in"                               : self.login,
+			r"sh(ow)?(\_|\-)?q(uest)?"                 : self.show_quest,
+			r"l(o?g)?out"                              : self.logout,
+			r"ch(ange)?(\_|\-)?p(ass)?(w(or)?d)?"      : self.change_password,
+			r"u(ser)?(\_|\-)?i(nfo)?"                  : self.user_info,
+			r"(sc?(ore)?|l(ead(er)?)?)b(oar)?d?"       : self.scoreboard,
+			r"p(ass)?(\_|\-)q(uest)?"                  : self.pass_quest,
+			r"h(elp)?"                                 : self.help
 			#r"ev?(ents?)?l(ist)?"                 :events_list
 		}
 
@@ -127,7 +129,7 @@ class FHQ():
 			print "unknown command"
 
 	def info(self, none = None):
-		i = r.get(self.url + 'public/info.php').json()
+		i = requests.get(self.url + 'public/info.php').json()
 		if i["result"] == "ok":
 			print "Sucssess..."
 			print "Lead Time (sec):", i["lead_time_sec"]
@@ -190,18 +192,36 @@ class FHQ():
 				# for user in data:
 				# 	print 'place  | {userid:<2} | {nick:<18} | {score:<5}'.format(**data[place][users][0])
 
+	def help(self, cmd = None):
+		func = {
+		"login or lin"           :"login into system",
+		"logout or lout"         :"logout",
+		"info or i"              :"Show to you general information",
+		"quests-list or ql"       :"Print quests list",
+		"user-info or ui"        :"Print information about user",
+		"scoreboard or scb"      :"Print scoreboard",
+		"choose-serv or chserv"  :"Change game url",
+		"choose-game or chg"     :"Choose game",
+		"time or t"              :"Show to you date and time",
+		"show-quest or shq"      :"Show to you quest information",
+		"change-password or chp" :"Change your password",
+		"pass-quest or pq"       :"Send your answer to server"
+		}
+		for f in func:
+			print "| {0:<25} {1}".format(f, func[f])
+
 
 fhq = FHQ()
 
 fhq.login('levkiselev@gmail.com')
-print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-command> [params]\nType 'help' for commands list."
+print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-command> [params]\nType 'help' for commands list or 'help -r' for regular expressions list."
 
 while True:
 	command = raw_input(fhq.choosed_game + "/" + fhq.choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
-	elif command == "h" or command == "help":
+	elif re.match(r"h(elp)? ?\-r", command):
 		for func in fhq.allFunc:
-			print func + '\t\t%s' % fhq.allFunc[func].__name__
+			print '| {0:<40} {1}'.format(func, fhq.allFunc[func].__name__)
 	else:
 		cmds = command.split()
 		fcmd = cmds.pop(0)
