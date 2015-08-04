@@ -31,7 +31,6 @@ class FHQ():
 			#r"ev?(ents?)?l(ist)?"                 :events_list
 		}
 
-
 	def login(self, mail = None):
 
 		if not mail:
@@ -45,9 +44,7 @@ class FHQ():
 			exit(1)
 		self.token = self.api.token
 
-	def choose_serv(self, ur):
-		# global url, email, password, token, api
-
+	def choose_serv(self, ur = None):
 		if not ur:
 			print("1: http://fhq.sea-kg.com/api/\n2: http://fhq.keva.su/api/\n3: http://localhost/fhq/api/")
 			numsrv = raw_input("Please choose server: ")
@@ -64,15 +61,15 @@ class FHQ():
 		else:
 			self.url = ur
 		self.api = FHQFrontEndLib(self.url)
-		login(self.email)
+		self.login(self.email)
 		print('Your token: ' + self.token)
 
-	def games_list(self):
+	def games_list(self, none = None):
 		glist = self.api.games.list()["data"]
 		for g in glist:
 			print "%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])
 
-	def choose_game(self, game):
+	def choose_game(self, game = None):
 		# global self.choosed_game
 		if game:
 			try:
@@ -89,21 +86,21 @@ class FHQ():
 		print('Choosed game ' + game['data']['title'])
 		print
 
-	def quests_list(self):
-			quests = self.api.quests.list({'filter_completed' : True, 'filter_open' : True, 'filter_current' : True})
-			formattablequests = '{:<8}|{:<15}|{:<20}|{:<10}|{:<5}'
-			print "\n"+formattablequests.format('Quest ID', 'Subject + Score', 'Name', 'Status', 'Solved')
-			print formattablequests.format('--------', '---------------', '--------------------', '----------', '-----')
-			for key, value in enumerate(quests['data']):
-				print formattablequests.format(value['questid'], value['subject'] + ' ' + value['score'], value['name'], value['status'], value['solved'])
-			print
-
-	def time(self):
-		print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
-
-	def show_quest(self, questid):
+	def quests_list(self, none = None):
 		if not self.choosed_game:
 			self.choose_game()
+		quests = self.api.quests.list({'filter_completed' : True, 'filter_open' : True, 'filter_current' : True})
+		formattablequests = '{:<8}|{:<15}|{:<20}|{:<10}|{:<5}'
+		print "\n"+formattablequests.format('Quest ID', 'Subject + Score', 'Name', 'Status', 'Solved')
+		print formattablequests.format('--------', '---------------', '--------------------', '----------', '-----')
+		for key, value in enumerate(quests['data']):
+			print formattablequests.format(value['questid'], value['subject'] + ' ' + value['score'], value['name'], value['status'], value['solved'])
+		print
+
+	def time(self, none = None):
+		print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
+
+	def show_quest(self, questid = None):
 		if not questid:
 			self.quests_list()
 			questid = raw_input('Chooce Quest: ')
@@ -116,7 +113,7 @@ class FHQ():
 		print quest['data']['text']
 		print
 
-	def pass_quest(self, string):
+	def pass_quest(self, string = None):
 		if re.match(r'^([0-9]+) (.*)$', string):
 			match = re.match(r'^([0-9]+) (.*)$', string)
 			questid = match.group(1)
@@ -129,7 +126,7 @@ class FHQ():
 		else:
 			print "unknown command"
 
-	def info(self):
+	def info(self, none = None):
 		i = r.get(self.url + 'public/info.php').json()
 		if i["result"] == "ok":
 			print "Sucssess..."
@@ -151,11 +148,11 @@ class FHQ():
 					print "    ", user["user"], " --> ", user["score"]
 		else: print "error"
 
-	def logout(self):
+	def logout(self, none = None):
 		out = {"token":self.api.token}
 		requests.post(self.url+"security/logout.php", params=out)
 
-	def change_password(self):
+	def change_password(self, none = None):
 		old_pass = getpass.getpass("Password: ")
 		new_pass = getpass.getpass("New Password: ")
 		confirm = getpass.getpass("Confirm new Password: ")
@@ -170,14 +167,14 @@ class FHQ():
 		else:
 			print "Fail"
 
-	def user_info(self, uid):
+	def user_info(self, uid = None):
 		if not uid:
 			uid = raw_input("user id: ")
 		answ = requests.post(self.url+"users/get.php", params={'userid':uid, "token":token}).json()
 		data = answ[u"data"]
 		for key in data: print "\n%s :  %s" % (key, data[key])
 
-	def scoreboard(self, gid):
+	def scoreboard(self, gid = None):
 		if not gid:
 			gid = raw_input('Enter gameid: ')
 		answ = requests.post(self.url+'games/scoreboard.php', params={"token":token, "gameid":gid}).json()
@@ -194,11 +191,9 @@ class FHQ():
 				# 	print 'place  | {userid:<2} | {nick:<18} | {score:<5}'.format(**data[place][users][0])
 
 
-
-
 fhq = FHQ()
 
-fhq.login('nitive@icloud.com')
+fhq.login('levkiselev@gmail.com')
 print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-command> [params]\nType 'help' for commands list."
 
 while True:
