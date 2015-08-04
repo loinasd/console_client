@@ -12,7 +12,7 @@ choosed_quest = ''
 email = ""
 url = 'http://fhq.sea-kg.com/api/'
 api = FHQFrontEndLib(url)
-
+email = "levkiselev@gmail.com"
 #####################
 
 def login(mail):
@@ -51,7 +51,8 @@ def choose_serv(ur):
 
 def games_list(none):
 	glist = api.games.list()["data"]
-	print ["%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"]) for g in glist]
+	for g in glist:
+		print "%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])
 
 def choose_game(game):
 	global choosed_game
@@ -82,6 +83,11 @@ def quests_list(none):
 def time(none): print datetime.now().strftime('%d/%m/%y::%H:%M:%S')
 
 def show_quest(questid):
+	if not choosed_game:
+		choose_game(None)
+	if not questid:
+		quests_list(None)
+		questid = raw_input('Chooce Quest: ')
 	quest = api.quests.get(questid)
 	print '   Subject: ' + quest['data']['subject']
 	print '     Score: ' + quest['data']['score']
@@ -158,25 +164,27 @@ def scoreboard(gid):
 			while len(users["nick"])<19:
 				users["nick"] += " "
 			print "   %s   | %s | %s| %s" %(place, users["userid"], users["nick"], users["score"])
+			#for user in data:
+     # print 'place  | {userid:<2} | {nick:<18} | {score:<5}'.format(**data[place][users][0])
 
 allFunc = {
-r"t(ime)?"                       :time,
-r"i(nfo)?"                       :info,
-r"ch(ange|oose)?serv"            :choose_serv,
-r'ch(ange|oose)?g(ame)?'         :choose_game,
-r"g(ame)?l(ist)?"                :games_list,
-r"q(uests?)?l(ist)?"             :quests_list,
-r"l(o?g)?in"                     :login,
-r"sh(ow)?q(uest)?"               :show_quest,
-r"l(o?g)?out"                    :logout,
-r"ch(ange)?p(ass)?(w(or)?d)?"    :change_password,
-r"u(ser)?i(nfo)?"                :user_info,
-r"(sc?(ore)?|l(ead)?)b(oar)?d?"  :scoreboard,
-#r"ev?(ents?)?l(ist)?"            :events_list
+r"t(ime)?"                            :time,
+r"i(nfo)?"                            :info,
+r"ch(ange|oose)?serv"                 :choose_serv,
+r'ch(ange|oose)?g(ame)?'              :choose_game,
+r"g(ame)?l(ist)?"                     :games_list,
+r"q(uests?)?l(ist)?"                  :quests_list,
+r"l(o?g)?in"                          :login,
+r"sh(ow)?q(uest)?"                    :show_quest,
+r"l(o?g)?out"                         :logout,
+r"ch(ange)?p(ass)?(w(or)?d)?"         :change_password,
+r"u(ser)?i(nfo)?"                     :user_info,
+r"(sc?(ore)?|l(ead(er)?)?)b(oar)?d?"  :scoreboard,
+#r"ev?(ents?)?l(ist)?"                 :events_list
 }
 
 login(email)
-print "All commands types without any whitespace symbols.\nUsage: <command> [params]\nType 'help' for command list."
+print "All commands types without any whitespace symbols.\nUsage: <command> [params]\nType 'help' for commands list."
 while True: 
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
