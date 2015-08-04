@@ -13,7 +13,7 @@ choosed_quest = ''
 email = ""
 url = 'http://fhq.sea-kg.com/api/'
 api = FHQFrontEndLib(url)
-
+email = "levkiselev@gmail.com"
 #####################
 
 def login(mail):
@@ -171,15 +171,15 @@ def scoreboard(gid):
 allFunc = {
 r"t(ime)?"                            :time,
 r"i(nfo)?"                            :info,
-r"ch(ange|oose)?serv"                 :choose_serv,
-r'ch(ange|oose)?g(ame)?'              :choose_game,
-r"g(ame)?l(ist)?"                     :games_list,
-r"q(uests?)?l(ist)?"                  :quests_list,
+r"ch(ange|oose)?\-?serv"              :choose_serv,
+r'ch(ange|oose)?\-?g(ame)?'           :choose_game,
+r"l?g(ame)?\-?l(ist)?"                :games_list,
+r"l?q(uests?)?\-?l(ist)?"             :quests_list,
 r"l(o?g)?in"                          :login,
-r"sh(ow)?q(uest)?"                    :show_quest,
+r"sh(ow)?\-?q(uest)?"                 :show_quest,
 r"l(o?g)?out"                         :logout,
-r"ch(ange)?p(ass)?(w(or)?d)?"         :change_password,
-r"u(ser)?i(nfo)?"                     :user_info,
+r"ch(ange)?\-?p(ass)?(w(or)?d)?"      :change_password,
+r"u(ser)?\-?i(nfo)?"                  :user_info,
 r"(sc?(ore)?|l(ead(er)?)?)b(oar)?d?"  :scoreboard,
 #r"ev?(ents?)?l(ist)?"                 :events_list
 }
