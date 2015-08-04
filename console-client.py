@@ -185,7 +185,7 @@ r"(sc?(ore)?|l(ead(er)?)?)b(oar)?d?"  :scoreboard,
 }
 
 login(email)
-print "All commands types without any whitespace symbols.\nUsage: <command> [params]\nType 'help' for commands list."
+print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-command> [params]\nType 'help' for commands list."
 while True: 
 	command = raw_input(choosed_game + "/" + choosed_quest + "> ")
 	if command == "exit" or command =="ex": break
