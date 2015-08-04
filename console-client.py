@@ -6,13 +6,14 @@ import getpass
 import re
 from FHQFrontEndLib import FHQFrontEndLib
 from datetime import datetime
+
 ########VAR###########
 choosed_game = ''
 choosed_quest = ''
 email = ""
 url = 'http://fhq.sea-kg.com/api/'
 api = FHQFrontEndLib(url)
-email = "levkiselev@gmail.com"
+
 #####################
 
 def login(mail):
