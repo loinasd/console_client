@@ -35,7 +35,7 @@ class FHQ():
 		}
 
 	def login(self, mail = None):
-		if not os.path.exists("token"):
+		if not os.path.exists(".tkn"):
 			if not mail:
 				self.email = raw_input("Email: ")
 				self.password = getpass.getpass('Password: ')
@@ -49,13 +49,13 @@ class FHQ():
 			print 'Your token: ' + self.token
 			t = raw_input("Do You want to save token?(y|n) ")
 			if t == "y":
-				f = open("token", "w")
+				f = open(".tkn", "w")
 				f.write(self.token)
 				f.close()
 
 		else:
-			self.token = open("token").read()
-			open("token").close()
+			self.token = open(".tkn").read()
+			open(".tkn").close()
 
 	def choose_serv(self, ur = None):
 		if not ur:
@@ -164,7 +164,7 @@ class FHQ():
 	def logout(self, none = None):
 		out = {"token":self.api.token}
 		requests.post(self.url+"security/logout.php", params=out)
-		os.remove('token')
+		os.remove('.tkn')
 
 	def change_password(self, none = None):
 		old_pass = getpass.getpass("Password: ")
