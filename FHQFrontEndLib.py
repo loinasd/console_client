@@ -3,6 +3,7 @@
 import os
 import requests
 import uuid 
+import getpass
 
 # api for work security
 class FHQSecurity:
@@ -127,5 +128,8 @@ class FHQFrontEndLib:
 			print(' * Error.Code: ' + str(resp['error']['code']))
 			print(' * Error.Message: ' + str(resp['error']['message']))
 			print ' ************'
+			e = raw_input("Email: ")
+			p = getpass.getpass('Password: ')
+			self.security.login(e, p)
 			return resp
 		return resp
