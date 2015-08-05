@@ -4,6 +4,7 @@ import requests
 import uuid
 import getpass
 import re
+import os
 from FHQFrontEndLib import FHQFrontEndLib
 from datetime import datetime
 
@@ -34,17 +35,27 @@ class FHQ():
 		}
 
 	def login(self, mail = None):
+		if not os.path.exists("token"):
+			if not mail:
+				self.email = raw_input("Email: ")
+				self.password = getpass.getpass('Password: ')
+			else:
+				self.email = mail
+				self.password = getpass.getpass('Password: ')
 
-		if not mail:
-			self.email = raw_input("Email: ")
-			self.password = getpass.getpass('Password: ')
+			if not self.api.security.login(self.email, self.password):
+				exit(1)
+			self.token = self.api.token
+			print 'Your token: ' + self.token
+			t = raw_input("Do You want to save token?(y|n) ")
+			if t == "y":
+				f = open("token", "w")
+				f.write(self.token)
+				f.close()
+
 		else:
-			self.email = mail
-			self.password = getpass.getpass('Password: ')
-
-		if not self.api.security.login(self.email, self.password):
-			exit(1)
-		self.token = self.api.token
+			self.token = open("token").read()
+			open("token").close()
 
 	def choose_serv(self, ur = None):
 		if not ur:
@@ -64,12 +75,11 @@ class FHQ():
 			self.url = ur
 		self.api = FHQFrontEndLib(self.url)
 		self.login(self.email)
-		print('Your token: ' + self.token)
 
 	def games_list(self, none = None):
 		glist = self.api.games.list()["data"]
 		for g in glist:
-			print "%s)  %s \t (%s) " % (glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])
+			print "{0}) {1:<25} {3} ".format(glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])
 
 	def choose_game(self, game = None):
 		# global self.choosed_game
@@ -154,6 +164,7 @@ class FHQ():
 	def logout(self, none = None):
 		out = {"token":self.api.token}
 		requests.post(self.url+"security/logout.php", params=out)
+		os.remove('token')
 
 	def change_password(self, none = None):
 		old_pass = getpass.getpass("Password: ")
