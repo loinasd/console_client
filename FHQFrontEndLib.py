@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import requests
 import uuid 
 
@@ -7,6 +8,15 @@ import uuid
 class FHQSecurity:
 	def  __init__(self, parent):
 		self.parent = parent
+
+	def istoken(self):
+		if os.path.exists(".tkn"):
+			t = open(".tkn")
+			self.parent.token = t.read()
+			t.close()
+			return True
+		else: return False
+
 	def login(self, email, password):
 		resp = self.parent.sendrequest('/security/login.php', {"email": email, "password": password})
 		if resp['result'] == 'fail':

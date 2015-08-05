@@ -5,6 +5,7 @@ import uuid
 import getpass
 import re
 import os
+import sys
 from FHQFrontEndLib import FHQFrontEndLib
 from datetime import datetime
 
@@ -14,6 +15,7 @@ class FHQ():
 		self.choosed_game = ''
 		self.choosed_quest = ''
 		self.email = ''
+		self.token = ''
 		self.url = 'http://fhq.sea-kg.com/api/'
 		self.api = FHQFrontEndLib(self.url)
 		self.allFunc = {
@@ -35,7 +37,12 @@ class FHQ():
 		}
 
 	def login(self, mail = None):
-		if not os.path.exists(".tkn"):
+		
+		if self.api.security.istoken():
+			self.token = self.api.token
+		#	print self.api.security.token
+			print self.token
+		else:
 			if not mail:
 				self.email = raw_input("Email: ")
 				self.password = getpass.getpass('Password: ')
@@ -43,8 +50,7 @@ class FHQ():
 				self.email = mail
 				self.password = getpass.getpass('Password: ')
 
-			if not self.api.security.login(self.email, self.password):
-				exit(1)
+			if not self.api.security.login(self.email, self.password): exit(1)
 			self.token = self.api.token
 			print 'Your token: ' + self.token
 			t = raw_input("Do You want to save token?(y|n) ")
@@ -52,10 +58,6 @@ class FHQ():
 				f = open(".tkn", "w")
 				f.write(self.token)
 				f.close()
-
-		else:
-			self.token = open(".tkn").read()
-			open(".tkn").close()
 
 	def choose_serv(self, ur = None):
 		if not ur:
@@ -79,7 +81,7 @@ class FHQ():
 	def games_list(self, none = None):
 		glist = self.api.games.list()["data"]
 		for g in glist:
-			print "{0}) {1:<25} {3} ".format(glist[g]["id"] ,glist[g]["title"],glist[g]["type_game"])
+			print "{0}) {1:<25} {2} ".format(glist[g]["id"], glist[g]["title"], glist[g]["type_game"])
 
 	def choose_game(self, game = None):
 		# global self.choosed_game
@@ -226,18 +228,28 @@ class FHQ():
 fhq = FHQ()
 
 fhq.login()
+
 print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-command> [params]\nType 'help' for commands list or 'help -r' for regular expressions list."
 
-while True:
-	command = raw_input(fhq.choosed_game + "/" + fhq.choosed_quest + "> ")
-	if command == "exit" or command =="ex": break
-	elif re.match(r"h(elp)? ?\-r", command):
-		for func in fhq.allFunc:
-			print '| {0:<40} {1}'.format(func, fhq.allFunc[func].__name__)
-	else:
-		cmds = command.split()
-		fcmd = cmds.pop(0)
-		scmd = " ".join(cmds)
-		for i in fhq.allFunc:
-			if re.match(i, fcmd+scmd):
-				fhq.allFunc[i](scmd)
+if not len(sys.argv)>1:
+	while True:
+		command = raw_input(fhq.choosed_game + "/" + fhq.choosed_quest + "> ")
+		if command == "exit" or command =="ex": break
+		elif re.match(r"h(elp)? ?\-r", command):
+			for func in fhq.allFunc:
+				print '| {0:<40} {1}'.format(func, fhq.allFunc[func].__name__)
+		else:
+			cmds = command.split()
+			fcmd = cmds.pop(0)
+			scmd = " ".join(cmds)
+			for i in fhq.allFunc:
+				if re.match(i, fcmd+scmd):
+					fhq.allFunc[i](scmd)
+
+else:
+	cmds = sys.argv[1:]
+	fcmd = cmds.pop(0)
+	scmd = " ".join(cmds)
+	for i in fhq.allFunc:
+		if re.match(i, fcmd+scmd):
+			fhq.allFunc[i](scmd)
