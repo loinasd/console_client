@@ -131,8 +131,8 @@ class FHQ():
 	def info(self, none = None):
 		i = requests.get(self.url + 'public/info.php').json()
 		if i["result"] == "ok":
-			print "Sucssess..."
-			print "Lead Time (sec):", i["lead_time_sec"]
+			#print "Sucssess..."
+			#print "Lead Time (sec):", i["lead_time_sec"]
 			data = i["data"]
 			print "Cities:   ",
 			for city in data["cities"]:
@@ -144,10 +144,11 @@ class FHQ():
 			print "Solved: %s  " % quests["solved"]
 			win = data["winners"]
 			for game in win:
-				print game + ": "
+				print "\n"+game + ":"
 				gam = win["%s" % game]
+				print "\t  {0:<20}  {1}\n".format("User", "Score")
 				for user in gam:
-					print "    ", user["user"], " --> ", user["score"]
+					print "\t| {0:<20}  {1} ".format(user["user"], user["score"])
 		else: print "error"
 
 	def logout(self, none = None):
@@ -213,7 +214,7 @@ class FHQ():
 
 fhq = FHQ()
 
-fhq.login('levkiselev@gmail.com')
+fhq.login()
 print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-command> [params]\nType 'help' for commands list or 'help -r' for regular expressions list."
 
 while True:
