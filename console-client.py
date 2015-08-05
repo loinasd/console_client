@@ -240,11 +240,17 @@ if not len(sys.argv)>1:
 				print '| {0:<40} {1}'.format(func, fhq.allFunc[func].__name__)
 		else:
 			cmds = command.split()
-			fcmd = cmds.pop(0)
+			try:
+				fcmd = cmds.pop(0)
+			except IndexError:
+				print "Empty string"
+				continue
 			scmd = " ".join(cmds)
 			for i in fhq.allFunc:
 				if re.match(i, fcmd+scmd):
 					fhq.allFunc[i](scmd)
+					continue
+			print "unknow command"
 
 else:
 	cmds = sys.argv[1:]
