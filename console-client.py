@@ -32,7 +32,8 @@ class FHQ():
 			r"u(ser)?(\_|\-)?i(nfo)?"                  : self.user_info,
 			r"(sc?(ore)?|l(ead(er)?)?)b(oar)?d?"       : self.scoreboard,
 			r"p(ass)?(\_|\-)q(uest)?"                  : self.pass_quest,
-			r"h(elp)?"                                 : self.help
+			r"h(elp)?"                                 : self.help,
+			r"u(se?rs?)?(\_|\-)?l(ist)?"               : self.user_list,
 			#r"ev?(ents?)?l(ist)?"                 :events_list
 		}
 
@@ -40,8 +41,6 @@ class FHQ():
 		
 		if self.api.security.istoken():
 			self.token = self.api.token
-		#	print self.api.security.token
-			print self.token
 		else:
 			if not mail:
 				self.email = raw_input("Email: ")
@@ -183,8 +182,13 @@ class FHQ():
 		else:
 			print "Fail"
 
+	def user_list(self, none = None):
+		list = requests.get(self.url+"users/list.php", params={"token":self.token}).json()
+		print list
+
 	def user_info(self, uid = None):
 		if not uid:
+			user_list()
 			uid = raw_input("user id: ")
 		answ = requests.post(self.url+"users/get.php", params={'userid':uid, "token":token}).json()
 		data = answ[u"data"]
@@ -249,9 +253,9 @@ if not len(sys.argv)>1:
 			for i in fhq.allFunc:
 				if re.match(i, fcmd+scmd):
 					fhq.allFunc[i](scmd)
-					continue
-			print "unknow command"
-
+					i = False
+					break
+			if i: print "Unknown command"
 else:
 	cmds = sys.argv[1:]
 	fcmd = cmds.pop(0)
