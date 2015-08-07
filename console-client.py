@@ -238,12 +238,13 @@ print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-co
 if not len(sys.argv)>1:
 	while True:
 		command = raw_input(fhq.choosed_game + "/" + fhq.choosed_quest + "> ")
-		if command == "exit" or command =="ex": break
+		if command == "exit" or "ex" or "q": break
 		elif re.match(r"h(elp)? ?\-r", command):
 			for func in fhq.allFunc:
 				print '| {0:<40} {1}'.format(func, fhq.allFunc[func].__name__)
 		else:
 			cmds = command.split()
+			count = True
 			try:
 				fcmd = cmds.pop(0)
 			except IndexError:
@@ -253,9 +254,9 @@ if not len(sys.argv)>1:
 			for i in fhq.allFunc:
 				if re.match(i, fcmd+scmd):
 					fhq.allFunc[i](scmd)
-					i = False
+					count = False
 					break
-			if i: print "Unknown command"
+			if count: print "Unknown command"
 else:
 	cmds = sys.argv[1:]
 	fcmd = cmds.pop(0)
