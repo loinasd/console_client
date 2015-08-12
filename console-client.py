@@ -38,7 +38,7 @@ class FHQ():
 		}
 
 	def login(self, mail = None):
-		
+
 		if self.api.security.istoken():
 			self.token = self.api.token
 		else:
@@ -238,7 +238,8 @@ print "All commands types conjoint or with hyphen.\nUsage: <command|two-words-co
 if not len(sys.argv)>1:
 	while True:
 		command = raw_input(fhq.choosed_game + "/" + fhq.choosed_quest + "> ")
-		if command == "exit" or "ex" or "q": break
+		if command in ["exit", "ex", "q"]:
+			break
 		elif re.match(r"h(elp)? ?\-r", command):
 			for func in fhq.allFunc:
 				print '| {0:<40} {1}'.format(func, fhq.allFunc[func].__name__)
