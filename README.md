@@ -2,6 +2,14 @@ This is console client for FreeHackQuest-platform.
 
 You must have python 2.6.X or higher.
 
+# Installation
+	
+	For debian: `apt-get install python-requests`
+
+# Run
+
+	`./console-client.py`
+
 Main commands:
 
     "login or lin"           :"login into system",

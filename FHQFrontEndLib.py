@@ -4,6 +4,7 @@ import os
 import requests
 import uuid 
 import getpass
+import sys
 
 # api for work security
 class FHQSecurity:
@@ -116,10 +117,11 @@ class FHQFrontEndLib:
 		r = requests.post(self.url + path, params)
 		if r.headers['content-type'] == 'application/json':
 			try:
-				resp = r.json()
-			except ValueError:
+				resp = r.json
+			except:
 				print r.text
-				raise Exception('invalid json')
+				print "Unexpected error:", sys.exc_info()[0]
+				raise
 
 		if resp['result'] == 'fail':
 			print ' *** FAIL *** '
